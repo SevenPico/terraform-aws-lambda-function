@@ -254,6 +254,6 @@ variable "file_system_config" {
   default     = null
   type = object({
     local_mount_path = string
-    arn              = string
+    arn              = list(string)
   })
 }
