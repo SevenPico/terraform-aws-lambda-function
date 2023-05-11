@@ -62,6 +62,14 @@ resource "aws_lambda_function" "this" {
       subnet_ids         = vpc_config.value.subnet_ids
     }
   }
+
+  dynamic "file_system_config" {
+    for_each = var.file_system_config != null ? [var.file_system_config] : []
+    content {
+      local_mount_path = file_system_config.value.local_mount_path
+      arn              = file_system_config.value.arn
+    }
+  }
 }
 
 data "aws_partition" "this" { count = local.enabled ? 1 : 0 }

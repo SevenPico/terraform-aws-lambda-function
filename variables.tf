@@ -245,3 +245,15 @@ variable "lambda_role_source_policy_documents" {
   default     = []
   type        = list(string)
 }
+
+variable "file_system_config" {
+  description = <<EOF
+  Provide EFS file system access point ARN and path where the function can access the file system.
+  The path must start with '/mnt/'.
+  EOF
+  default     = null
+  type = object({
+    local_mount_path = string
+    arn              = string
+  })
+}
