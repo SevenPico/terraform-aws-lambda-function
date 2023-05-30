@@ -4,7 +4,7 @@
 #--------------------------------------------------
 locals {
   service_principal_identifiers = var.lambda_at_edge ? ["edgelambda.amazonaws.com"] : ["lambda.amazonaws.com"]
-  role_name                     = var.role_name == "" ? "${var.function_name}-${local.region_name}" : var.role_name
+  role_name                     = var.role_name == "" ? "${var.function_name}-${local.region}" : var.role_name
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -74,7 +74,7 @@ data "aws_iam_policy_document" "ssm" {
       "ssm:GetParametersByPath",
     ]
 
-    resources = formatlist("arn:${local.partition}:ssm:${local.region_name}:${local.account_id}:parameter%s", var.ssm_parameter_names)
+    resources = formatlist("${local.arn_prefix}:ssm:${local.region}:${local.account_id}:parameter%s", var.ssm_parameter_names)
   }
 }
 
@@ -99,20 +99,20 @@ resource "aws_iam_role_policy_attachment" "ssm" {
 resource "aws_iam_role_policy_attachment" "cloudwatch_insights" {
   count = local.enabled && var.cloudwatch_lambda_insights_enabled ? 1 : 0
 
-  policy_arn = "arn:${local.partition}:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
+  policy_arn = "${local.arn_prefix}:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
   role       = aws_iam_role.this[0].name
 }
 
 resource "aws_iam_role_policy_attachment" "vpc_access" {
   count = local.enabled && var.vpc_config == null ? 1 : 0
 
-  policy_arn = "arn:${local.partition}:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+  policy_arn = "${local.arn_prefix}:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
   role       = aws_iam_role.this[0].name
 }
 
 resource "aws_iam_role_policy_attachment" "xray" {
   count = local.enabled && var.tracing_config_mode == null ? 1 : 0
 
-  policy_arn = "arn:${local.partition}:iam::aws:policy/AWSXRayDaemonWriteAccess"
+  policy_arn = "${local.arn_prefix}:iam::aws:policy/AWSXRayDaemonWriteAccess"
   role       = aws_iam_role.this[0].name
 }
