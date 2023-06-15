@@ -1,5 +1,5 @@
 locals {
-  enabled     = module.context.enabled
+  enabled = module.context.enabled
 }
 
 resource "aws_cloudwatch_log_group" "this" {
