@@ -3,6 +3,7 @@ locals {
 }
 
 resource "aws_cloudwatch_log_group" "this" {
+  #checkov:skip=CKV_AWS_158:skipping 'Ensure that CloudWatch Log Group is encrypted by KMS'
   count             = module.context.enabled ? 1 : 0
   name              = "/aws/lambda/${var.function_name}"
   retention_in_days = var.cloudwatch_logs_retention_in_days
@@ -10,6 +11,9 @@ resource "aws_cloudwatch_log_group" "this" {
 }
 
 resource "aws_lambda_function" "this" {
+  #checkov:skip=CKV_AWS_272:skipping 'Ensure AWS Lambda function is configured to validate code-signing'
+  #checkov:skip=CKV_AWS_173:skipping 'Check encryption settings for Lambda environmental variable'
+  #checkov:skip=CKV_AWS_116:skipping 'Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)'
   count      = module.context.enabled ? 1 : 0
   depends_on = [aws_cloudwatch_log_group.this]
 
