@@ -27,3 +27,8 @@ output "role_name" {
   description = "The Name of the lambda function IAM Role"
   value       = local.enabled ? aws_iam_role.this[0].name : null
 }
+
+output "cloudwatch_log_group" {
+  description = "The Name of the lambda function's log group"
+  value       = local.enabled ? aws_cloudwatch_log_group.this[0].name : null
+}
