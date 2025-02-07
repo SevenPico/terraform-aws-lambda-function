@@ -257,3 +257,21 @@ variable "file_system_config" {
     arn              = string
   })
 }
+
+variable "dead_letter_config" {
+    description = <<EOF
+    The [dead letter configuration](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function#dead_letter_config)
+    block with one argument:
+    - *target_arn* - The ARN of an SNS topic or SQS queue to notify when an invocation fails.
+    EOF
+    default     = null
+    type        = object({
+      target_arn = string
+    })
+}
+
+variable "cloudwatch_kms_key_id" {
+    description = "The KMS key ARN to use to encrypt log data."
+    default     = null
+    type        = string
+}

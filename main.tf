@@ -7,6 +7,7 @@ resource "aws_cloudwatch_log_group" "this" {
   count             = module.context.enabled ? 1 : 0
   name              = "/aws/lambda/${var.function_name}"
   retention_in_days = var.cloudwatch_logs_retention_in_days
+  kms_key_id        = var.cloudwatch_kms_key_id
   tags              = module.context.tags
 }
 
@@ -38,10 +39,17 @@ resource "aws_lambda_function" "this" {
   tags                           = var.tags
   timeout                        = var.timeout
 
+  dynamic "dead_letter_config" {
+    for_each = var.dead_letter_config != null ? [var.dead_letter_config] : []
+    content {
+      target_arn = dead_letter_config.target_arn
+    }
+  }
+
   dynamic "environment" {
     for_each = var.lambda_environment != null ? [var.lambda_environment] : []
     content {
-      variables = environment.value.variables
+      variables = environment.variables
     }
   }
 
