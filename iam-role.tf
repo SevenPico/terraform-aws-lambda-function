@@ -23,6 +23,7 @@ resource "aws_iam_role" "this" {
   count              = local.enabled ? 1 : 0
   name               = local.role_name
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy[0].json
+  tags               = module.context.tags
 }
 
 
@@ -51,6 +52,7 @@ resource "aws_iam_policy" "this" {
   description = "Provides minimum Cloudwatch permissions."
   name        = "${local.role_name}-policy"
   policy      = data.aws_iam_policy_document.this[0].json
+  tags               = module.context.tags
 }
 
 resource "aws_iam_role_policy_attachment" "this" {
@@ -84,6 +86,7 @@ resource "aws_iam_policy" "ssm" {
   description = "Provides minimum SSM read permissions."
   name        = "${local.role_name}-ssm-policy"
   policy      = data.aws_iam_policy_document.ssm[count.index].json
+  tags        = module.context.tags
 }
 
 resource "aws_iam_role_policy_attachment" "ssm" {
