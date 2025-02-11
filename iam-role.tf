@@ -1,11 +1,11 @@
-#--------------------------------------------------
-# Base IAM Assume Role and Policies using SevenPico module
-#--------------------------------------------------
-
 locals {
   service_principal_identifiers = var.lambda_at_edge ? ["edgelambda.amazonaws.com"] : ["lambda.amazonaws.com"]
   role_name                     = var.role_name == "" ? "${var.function_name}-${local.region}" : var.role_name
 }
+
+#--------------------------------------------------
+# Base Policy
+#--------------------------------------------------
 
 data "aws_iam_policy_document" "lambda_base_policy" {
   count = module.context.enabled ? 1 : 0
@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "lambda_base_policy" {
     ]
     effect = "Allow"
     resources = [
-      "${aws_cloudwatch_log_group.this[0].arn}:*" # Assuming aws_cloudwatch_log_group.this is defined
+      "${aws_cloudwatch_log_group.this[0].arn}:*"
     ]
   }
 
@@ -27,15 +27,15 @@ data "aws_iam_policy_document" "lambda_base_policy" {
       sid       = lookup(each.value, "sid", null)
       actions   = lookup(each.value, "actions", [])
       resources = lookup(each.value, "resources", [])
-      effect    = lookup(each.value, "effect", "Allow") # Default to Allow if effect isn't specified
+      effect    = lookup(each.value, "effect", "Allow")
     }
   }
 }
 
 #--------------------------------------------------
-# SSM Policy (moved inside the main module)
+# SSM Policy
 #--------------------------------------------------
-data "aws_iam_policy_document" "ssm" {
+data "aws_iam_policy_document" "ssm_policy" {
   count = try((module.context.enabled && var.ssm_parameter_names != null && length(var.ssm_parameter_names) > 0), false) ? 1 : 0
 
   statement {
@@ -48,6 +48,10 @@ data "aws_iam_policy_document" "ssm" {
     resources = formatlist("${local.arn_prefix}:ssm:${local.region}:${local.account_id}:parameter%s", var.ssm_parameter_names)
   }
 }
+
+# --------------------------------------------------
+# Lambda Role
+# --------------------------------------------------
 module "role" {
   count = module.context.enabled ? 1 : 0
 
@@ -70,7 +74,7 @@ module "role" {
   policy_description = "Policy for Lambda function ${var.function_name}"
   policy_documents = [
     data.aws_iam_policy_document.lambda_base_policy[0].json,
-    try(data.aws_iam_policy_document.ssm[0].json, null),
+    try(data.aws_iam_policy_document.ssm_policy[0].json, null),
   ]
 
   managed_policy_arns = concat(
