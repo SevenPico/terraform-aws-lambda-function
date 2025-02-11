@@ -277,7 +277,7 @@ variable "cloudwatch_kms_key_id" {
 }
 
 variable "lambda_role_managed_policy_arns" {
-    description = "List of ARNs of IAM managed policies to attach to the Lambda Function's execution role."
-    default     = []
-    type        = list(string)
+  description = "List of ARNs of IAM managed policies to attach to the Lambda Function's execution role."
+  default     = []
+  type        = list(string)
 }

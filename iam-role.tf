@@ -67,10 +67,10 @@ module "role" {
   permissions_boundary = ""
   role_description     = "IAM role for Lambda function ${var.function_name}"
 
-  policy_description   = "Policy for Lambda function ${var.function_name}"
+  policy_description = "Policy for Lambda function ${var.function_name}"
   policy_documents = [
     data.aws_iam_policy_document.lambda_base_policy[0].json,
-   try(data.aws_iam_policy_document.ssm[0].json, null) ,
+    try(data.aws_iam_policy_document.ssm[0].json, null),
   ]
 
   managed_policy_arns = concat(
