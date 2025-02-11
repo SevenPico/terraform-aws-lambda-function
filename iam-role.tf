@@ -52,7 +52,7 @@ resource "aws_iam_policy" "this" {
   description = "Provides minimum Cloudwatch permissions."
   name        = "${local.role_name}-policy"
   policy      = data.aws_iam_policy_document.this[0].json
-  tags               = module.context.tags
+  tags        = module.context.tags
 }
 
 resource "aws_iam_role_policy_attachment" "this" {
