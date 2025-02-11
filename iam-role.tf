@@ -6,7 +6,6 @@ locals {
 #--------------------------------------------------
 # Base Policy
 #--------------------------------------------------
-
 data "aws_iam_policy_document" "lambda_base_policy" {
   count = module.context.enabled ? 1 : 0
   statement {
