@@ -49,7 +49,7 @@ resource "aws_lambda_function" "this" {
   dynamic "environment" {
     for_each = var.lambda_environment != null ? [var.lambda_environment] : []
     content {
-      variables = environment.variables
+      variables = lookup(environment.value.variables, {})
     }
   }
 

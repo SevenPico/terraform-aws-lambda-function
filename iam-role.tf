@@ -1,6 +1,5 @@
 locals {
   service_principal_identifiers = var.lambda_at_edge ? ["edgelambda.amazonaws.com"] : ["lambda.amazonaws.com"]
-  role_name                     = var.role_name == "" ? "${var.function_name}-${local.region}" : var.role_name
 }
 
 #--------------------------------------------------
@@ -48,7 +47,8 @@ module "role" {
   version = "2.0.2" # Or latest
 
   context    = module.context.self
-  attributes = [local.role_name]
+  attributes = ["role"]
+  name       = var.role_name
 
   assume_role_actions = ["sts:AssumeRole"]
   principals = {
@@ -73,7 +73,7 @@ module "role" {
     var.lambda_role_managed_policy_arns
   )
 
-  use_fullname = true
+  use_fullname = var.role_name == "" ? true : false
   tags         = module.context.tags
 }
 
