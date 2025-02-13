@@ -6,9 +6,11 @@ module "label" {
   context = module.context.self
 }
 
+# Cloud Posse does NOT recommend building and pushing images to ECR via Terraform code. This is a job for your CI/CD
+# pipeline. It is only done here for convenience and so that the example can be run locally.
 module "ecr" {
   source  = "cloudposse/ecr/aws"
-  version = "0.32.3"
+  version = "0.34.0"
   name    = module.label.id
 
   context = module.context.self
