@@ -7,7 +7,9 @@ locals {
 # Base Policy
 #--------------------------------------------------
 data "aws_iam_policy_document" "lambda_base_policy" {
-  count = module.context.enabled ? 1 : 0
+  count                   = module.context.enabled ? 1 : 0
+  source_policy_documents = var.lambda_role_source_policy_documents
+
   statement {
     sid = "Logging"
     actions = [
@@ -18,16 +20,6 @@ data "aws_iam_policy_document" "lambda_base_policy" {
     resources = [
       "${aws_cloudwatch_log_group.this[0].arn}:*"
     ]
-  }
-
-  dynamic "statement" {
-    for_each = var.lambda_role_source_policy_documents != null ? var.lambda_role_source_policy_documents : []
-    content {
-      sid       = lookup(statement.value, "sid", null)
-      actions   = lookup(statement.value, "actions", [])
-      resources = lookup(statement.value, "resources", [])
-      effect    = lookup(statement.value, "effect", "Allow")
-    }
   }
 }
 
