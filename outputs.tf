@@ -20,12 +20,12 @@ output "qualified_arn" {
 
 output "role_arn" {
   description = "ARN of the lambda function IAM Role"
-  value       = local.enabled ? aws_iam_role.this[0].arn : null
+  value       = local.enabled ? module.role.arn : null
 }
 
 output "role_name" {
   description = "The Name of the lambda function IAM Role"
-  value       = local.enabled ? aws_iam_role.this[0].name : null
+  value       = local.enabled ? module.role.arn : null
 }
 
 output "cloudwatch_log_group" {

@@ -1,13 +1,14 @@
 locals {
   service_principal_identifiers = var.lambda_at_edge ? ["edgelambda.amazonaws.com"] : ["lambda.amazonaws.com"]
-  role_name                     = var.role_name == "" ? "${var.function_name}-${local.region}" : var.role_name
 }
 
 #--------------------------------------------------
 # Base Policy
 #--------------------------------------------------
 data "aws_iam_policy_document" "lambda_base_policy" {
-  count = module.context.enabled ? 1 : 0
+  count                   = module.context.enabled ? 1 : 0
+  source_policy_documents = var.lambda_role_source_policy_documents
+
   statement {
     sid = "Logging"
     actions = [
@@ -18,16 +19,6 @@ data "aws_iam_policy_document" "lambda_base_policy" {
     resources = [
       "${aws_cloudwatch_log_group.this[0].arn}:*"
     ]
-  }
-
-  dynamic "statement" {
-    for_each = var.lambda_role_source_policy_documents != null ? var.lambda_role_source_policy_documents : {}
-    content {
-      sid       = lookup(each.value, "sid", null)
-      actions   = lookup(each.value, "actions", [])
-      resources = lookup(each.value, "resources", [])
-      effect    = lookup(each.value, "effect", "Allow")
-    }
   }
 }
 
@@ -52,13 +43,12 @@ data "aws_iam_policy_document" "ssm_policy" {
 # Lambda Role
 # --------------------------------------------------
 module "role" {
-  count = module.context.enabled ? 1 : 0
-
   source  = "registry.terraform.io/SevenPicoForks/iam-role/aws"
   version = "2.0.2" # Or latest
 
   context    = module.context.self
-  attributes = [local.role_name]
+  attributes = ["role"]
+  name       = var.role_name
 
   assume_role_actions = ["sts:AssumeRole"]
   principals = {
@@ -83,7 +73,7 @@ module "role" {
     var.lambda_role_managed_policy_arns
   )
 
-  use_fullname = true
+  use_fullname = var.role_name == "" ? true : false
   tags         = module.context.tags
 }
 
