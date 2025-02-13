@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "lambda_base_policy" {
   }
 
   dynamic "statement" {
-    for_each = var.lambda_role_source_policy_documents != null ? var.lambda_role_source_policy_documents : {}
+    for_each = var.lambda_role_source_policy_documents != null ? var.lambda_role_source_policy_documents : []
     content {
       sid       = lookup(each.value, "sid", null)
       actions   = lookup(each.value, "actions", [])
@@ -52,8 +52,6 @@ data "aws_iam_policy_document" "ssm_policy" {
 # Lambda Role
 # --------------------------------------------------
 module "role" {
-  count = module.context.enabled ? 1 : 0
-
   source  = "registry.terraform.io/SevenPicoForks/iam-role/aws"
   version = "2.0.2" # Or latest
 
