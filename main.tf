@@ -7,6 +7,7 @@ resource "aws_cloudwatch_log_group" "this" {
   count             = module.context.enabled ? 1 : 0
   name              = "/aws/lambda/${var.function_name}"
   retention_in_days = var.cloudwatch_logs_retention_in_days
+  kms_key_id        = var.cloudwatch_logs_kms_key_arn
   tags              = module.context.tags
 }
 
@@ -29,7 +30,7 @@ resource "aws_lambda_function" "this" {
   package_type                   = var.package_type
   publish                        = var.publish
   reserved_concurrent_executions = var.reserved_concurrent_executions
-  role                           = aws_iam_role.this[0].arn
+  role                           = module.role.arn
   runtime                        = var.runtime
   s3_bucket                      = var.s3_bucket
   s3_key                         = var.s3_key
@@ -38,10 +39,17 @@ resource "aws_lambda_function" "this" {
   tags                           = var.tags
   timeout                        = var.timeout
 
+  dynamic "dead_letter_config" {
+    for_each = var.dead_letter_config != null ? [var.dead_letter_config] : []
+    content {
+      target_arn = dead_letter_config.target_arn
+    }
+  }
+
   dynamic "environment" {
     for_each = var.lambda_environment != null ? [var.lambda_environment] : []
     content {
-      variables = environment.value.variables
+      variables = environment.variables
     }
   }
 
