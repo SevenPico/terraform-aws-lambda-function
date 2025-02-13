@@ -23,10 +23,10 @@ data "aws_iam_policy_document" "lambda_base_policy" {
   dynamic "statement" {
     for_each = var.lambda_role_source_policy_documents != null ? var.lambda_role_source_policy_documents : []
     content {
-      sid       = lookup(each.value, "sid", null)
-      actions   = lookup(each.value, "actions", [])
-      resources = lookup(each.value, "resources", [])
-      effect    = lookup(each.value, "effect", "Allow")
+      sid       = lookup(statement.value, "sid", null)
+      actions   = lookup(statement.value, "actions", [])
+      resources = lookup(statement.value, "resources", [])
+      effect    = lookup(statement.value, "effect", "Allow")
     }
   }
 }
