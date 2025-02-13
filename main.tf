@@ -42,14 +42,14 @@ resource "aws_lambda_function" "this" {
   dynamic "dead_letter_config" {
     for_each = var.dead_letter_config != null ? [var.dead_letter_config] : []
     content {
-      target_arn = dead_letter_config.target_arn
+      target_arn = var.dead_letter_config.target_arn
     }
   }
 
   dynamic "environment" {
     for_each = var.lambda_environment != null ? [var.lambda_environment] : []
     content {
-      variables = environment.variables
+      variables = var.lambda_environment.variables
     }
   }
 
