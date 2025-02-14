@@ -56,15 +56,15 @@ module "role" {
   }
 
   max_session_duration = 3600
-  path                 = "/aws/lambda"
+  path                 = "/aws/lambda/"
   permissions_boundary = ""
   role_description     = "IAM role for Lambda function ${var.function_name}"
 
   policy_description = "Policy for Lambda function ${var.function_name}"
-  policy_documents = [
-    data.aws_iam_policy_document.lambda_base_policy[0].json,
-    try(data.aws_iam_policy_document.ssm_policy[0].json, null),
-  ]
+  policy_documents = concat(
+    try([data.aws_iam_policy_document.lambda_base_policy[0].json], []),
+    try([data.aws_iam_policy_document.ssm_policy[0].json], []),
+  )
 
   managed_policy_arns = concat(
     module.context.enabled && var.cloudwatch_lambda_insights_enabled ? ["arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"] : [],
