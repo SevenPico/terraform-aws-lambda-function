@@ -56,7 +56,7 @@ module "role" {
   }
 
   max_session_duration = 3600
-  path                 = "/aws/lambda/"
+  path                 = "/"
   permissions_boundary = ""
   role_description     = "IAM role for Lambda function ${var.function_name}"
 
