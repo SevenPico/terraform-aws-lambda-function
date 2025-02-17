@@ -25,7 +25,7 @@ output "role_arn" {
 
 output "role_name" {
   description = "The Name of the lambda function IAM Role"
-  value       = local.enabled ? module.role.arn : null
+  value       = local.enabled ? module.role.name : null
 }
 
 output "cloudwatch_log_group" {
